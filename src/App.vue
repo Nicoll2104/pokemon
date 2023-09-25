@@ -2,13 +2,13 @@
 import axios from "axios";
 import { ref } from "vue";
 
-const todo = ref("");
+const todo = ref([]);
 const hola = ref(true);
 
-async function obtenerUrlsPokemon() {
-  let r = await axios.get("https://pokeapi.co/api/v2/pokemon/25/");
+async function obtenerUrlsPokemon(i) {
+  let r = await axios.get(`https://pokeapi.co/api/v2/pokemon/${i}/`);
   console.log(r);
-  todo.value = {
+  todo.value.push({
     id: r.data.id,
     img: r.data.sprites.other["official-artwork"].front_default,
     nombre: r.data.name,
@@ -18,50 +18,28 @@ async function obtenerUrlsPokemon() {
       return { name: e.stat.name, cant: e.base_stat };
     }),
     tipos: r.data.types.map((e) => e.type.name),
-  };
+  });
 }
 
-const concatenar = (cant) =>{
-  let a = 'width: '
-  a += cant
-  a += "%"
-  return a
+for(let i=1; i<=50;i++){
+  obtenerUrlsPokemon(i)
 }
+
 </script>
 
 <template>
   <div class="original">
-    <div v-if="hola">
-      <h1 class="id">#{{ todo.id }}</h1>
-      <h1 class="nombre">{{ todo.nombre }}</h1>
-      <div v-for="(tipo, index) in todo.tipos" :key="index">
-        {{ tipo }}
-      </div>
-      <div class="juntos">
-        <h1>Altura:</h1>
-        <p>{{ todo.altura }}</p>
-        <h1>peso:</h1>
-        <p>{{ todo.peso }} KG</p>
-      </div>
-      <div class="esta">
-        <h1>estadisticas</h1>
-        <div class="esta1">
-          <div v-for="(stat, index) in todo.estadisticas" :key="index">
-            <p>{{ stat.name }}</p>
-            <div style="width: 100%; height: 25px; background-color: rgb(209, 169, 169); border-radius:50px ;">
-              <div :style="concatenar(stat.cant)" class="barra" >{{ stat.cant }} </div>
-            </div>
-            <p>{{ stat.cant }}</p>
-          </div>
-        </div>
-      </div>
-      <div class="body">
-        <button @click="obtenerUrlsPokemon()" class="boton">peticion</button>
-        <img :src="todo.img" alt="" />
+    <div v-for="pokemon in todo" :key="pokemon.id" class="card" style="width: 18rem;">
+      <img :src="pokemon.img" class="card-img-top" alt="...">
+      <div class="card-body">
+        <h5 class="card-title">{{ pokemon.id }}</h5>
+        <p class="card-text">{{ pokemon.nombre }}</p>
+        <h2 class="tipo" v-for="tipo in pokemon.tipos">{{ tipo }}</h2>
       </div>
     </div>
   </div>
 </template>
+
 
 <style scoped>
 .id {
@@ -86,7 +64,31 @@ const concatenar = (cant) =>{
   background-color: red;
 }
 
+.esta{
+  display: flex;
+  flex-direction: row;
+}
+
 .esta1{
   width: 500px;
+  margin-left: 60px;
+}
+
+.abajo{
+  font-size: 45px;
+  margin: 200px 0 0 50px;
+  text-align: center;
+  justify-content: center;
+}
+
+
+.juntos{
+  display: flex;
+  flex-direction: row;
+  line-height: 1%;
+}
+
+.juntos1{
+  margin-left: 50px;
 }
 </style>
