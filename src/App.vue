@@ -2,21 +2,44 @@
   <div class="todo">
     <div class="barra">
       <h1 class="logo">pokeapi</h1>
-    <input type="text" placeholder=" 🔍Buscar" id="barra1">
-    <button id="boton">Buscar</button>
+    <input type="text" placeholder=" 🔍Buscar" id="barra1" v-model="txtBuscar">
+    <button id="boton" @click="buscar()">Buscar</button>
   </div>
   <div id="filtro">
+    <p class="d-inline-flex gap-1">
+  <button  id="filtro1" class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
     <img src="https://cdn-icons-png.flaticon.com/512/6526/6526846.png" alt="">
+    <h2>Filtrar</h2>
+  </button>
+</p>
+<div class="collapse" id="collapseExample">
+  <div class="card card-body">
+    Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
+  </div>
+</div>
+  </div>
+    <div class="card-grid" v-if="componenteBuscar">
+      <div class="card">
+      <img :src="buscado.img" class="card-img-top" alt="..." data-bs-toggle="modal" :data-bs-target="'#exampleModal' + buscado.id">
+      <div class="card-body">
+        <h5 class="card-title">N°{{ buscado.id }}</h5>
+        <h1 class="card-text">{{ buscado.nombre }}</h1>
+        <p class="tipo" v-for="tipo in buscado.tipos" :style="'background-color:' + colores[tipo]">{{ tipo }}</p>
+      </div>
     </div>
-  <div class="original card-grid">
+  </div>
+  <div class=" card-grid" v-if="!componenteBuscar">
     <div v-for="pokemon in todo" :key="pokemon.id" class="card">
       <img :src="pokemon.img" class="card-img-top" alt="..." data-bs-toggle="modal" :data-bs-target="'#exampleModal' + pokemon.id">
       <div class="card-body">
         <h5 class="card-title">N°{{ pokemon.id }}</h5>
         <h1 class="card-text">{{ pokemon.nombre }}</h1>
-        <p class="tipo" v-for="tipo in pokemon.tipos">{{ tipo }}</p>
+        <p class="tipo" v-for="tipo in pokemon.tipos" :style="'background-color:' + colores[tipo]">{{ tipo }}</p>
       </div>
     </div>
+    <div class="ultimo">
+    <button @click="mostrar()"> Ver más</button>
+  </div>
   </div>
   <div>
     <div v-for="pokemon in todo" :key="pokemon.id">
@@ -29,6 +52,7 @@
             </div>
             <div class="modal-body">
               <img :src="pokemon.img" alt="" class="img-fluid" />
+              <p class="tipo" v-for="tipo in pokemon.tipos" :style="'background-color:' + colores[tipo]">{{ tipo }}</p>
               <p>ID: {{ pokemon.id }}</p>
               <p>Altura: {{ pokemon.altura }}</p>
               <p>Peso: {{ pokemon.peso }}</p>
@@ -58,7 +82,38 @@ import axios from "axios";
 import { ref } from "vue";
 
 const todo = ref([]);
-const hola = ref(true);
+const colores = {
+  grass: "#689F38 ",
+  poison: "#b50d82",
+  fire: "#ff7404",
+  flying: "#A890F0",
+  water: "#3498DB",
+  bug: "#A8b820",
+  normal: "#fdddca",
+  electric:"#cfa055",
+  ground: "#795548",
+  fairy: "#FF69B4",
+  fighting: "#CC0000",
+  psychic: "#FFFF00",
+  rock: "#b8b6ad",
+  steel: "#a6cad4",
+  ice:"#e7eff6",
+  ghost:"#8f728e"
+};
+const componenteBuscar = ref(false); 
+
+let cant = 1
+let limites = 50
+
+function mostrar(){
+  for(cant; cant <= limites; cant ++){
+    obtenerUrlsPokemon(cant)
+  }
+  limites += 50
+  console.log(todo.value);
+}
+
+mostrar()
 
 async function obtenerUrlsPokemon(i) {
   let r = await axios.get(`https://pokeapi.co/api/v2/pokemon/${i}/`);
@@ -76,8 +131,13 @@ async function obtenerUrlsPokemon(i) {
   });
 }
 
-for(let i=1; i<=50;i++){
-  obtenerUrlsPokemon(i)
+const txtBuscar = ref("")
+const buscado = ref({})
+
+function buscar(){
+  buscado.value = todo.value.find(s =>s.nombre == txtBuscar.value)
+  componenteBuscar.value = true
+
 }
 </script>
 
@@ -96,7 +156,8 @@ for(let i=1; i<=50;i++){
 
   .card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+
     gap: 1rem;
     padding: 20px;
   }
@@ -105,12 +166,20 @@ for(let i=1; i<=50;i++){
     width: 270px;
     height: 250px;
   }
+
+  .card-img-top{
+    background-color: rgb(229, 229, 229);
+  } 
   .card {
     width: 100%;
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-text{
+    font-size: 25px;
   }
   .modal-content {
     background-color: #fff;
@@ -139,6 +208,7 @@ for(let i=1; i<=50;i++){
     color: #fff;
     padding: 10px;
     display: flex;
+    width: 700px;
   }
 
   .logo {
@@ -155,7 +225,6 @@ for(let i=1; i<=50;i++){
     color: black;
     border: 1px solid black;
     border-radius: 400px;
-    width: 8px;
   }
 
   #boton {
@@ -163,7 +232,8 @@ for(let i=1; i<=50;i++){
     color: #007bff;
     border: 1px solid black;
     padding: 8px 16px;
-    cursor: pointer;
+    margin-left:30px ;
+    border-radius: 400px;
   }
 
   #filtro {
@@ -175,5 +245,22 @@ for(let i=1; i<=50;i++){
     width: 32px;
     height: 32px;
   }
+
+  .tipo{
+    width: 70px;
+    border-radius: 400px;
+    text-align: center;
+    display: flex;
+    flex-direction:column;
+  }
+
+ #filtro1{
+  display: flex;
+  flex-direction: row;
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: black;
+ }
+
 </style>
 
