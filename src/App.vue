@@ -1,10 +1,14 @@
 <template>
   <div class="todo">
+    <div class="arriba">
+      <div class="logo">
+      <img src="/src/assets/img.png" alt="" id="logo">
+    </div>
     <div class="barra">
-      <h1 class="logo">pokeapi</h1>
     <input type="text" placeholder=" 🔍Buscar" id="barra1" v-model="txtBuscar">
     <button id="boton" @click="buscar()">Buscar</button>
   </div>
+</div>
   <div id="filtro">
     <p class="d-inline-flex gap-1">
   <button  id="filtro1" class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
@@ -12,9 +16,12 @@
     <h2>Filtrar</h2>
   </button>
 </p>
-<div class="collapse" id="collapseExample">
-  <div class="card card-body">
-    Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
+<div class="collapse" id="collapseExample" >
+  <div class="card card-body" id="opciones">
+    <div v-for="(opcion, index) in opciones" :key="index" id="opcion1">
+      <input type="radio" :id="'opcion' + (index + 1)" :name="'grupoOpciones'" :value="opcion" v-model="opcionSeleccionada">
+      <label :for="'opcion' + (index + 1)">{{ opcion }}</label><br>
+    </div>
   </div>
 </div>
   </div>
@@ -38,7 +45,7 @@
       </div>
     </div>
     <div class="ultimo">
-    <button @click="mostrar()"> Ver más</button>
+    <button @click="mostrar()" id="ultimo"> Ver más</button>
   </div>
   </div>
   <div>
@@ -47,15 +54,15 @@
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <h1 class="modal-title fs-5" id="exampleModalLabel">{{ pokemon.nombre }}</h1>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+              <h1 class="id-modal">#{{ pokemon.id }}</h1>
+              <h1 class="nombre-modal">{{ pokemon.nombre }}</h1>
               <img :src="pokemon.img" alt="" class="img-fluid" />
-              <p class="tipo" v-for="tipo in pokemon.tipos" :style="'background-color:' + colores[tipo]">{{ tipo }}</p>
-              <p>ID: {{ pokemon.id }}</p>
-              <p>Altura: {{ pokemon.altura }}</p>
-              <p>Peso: {{ pokemon.peso }}</p>
+              <p class="tipo" id="tipo-modal" v-for="tipo in pokemon.tipos" :style="'background-color:' + colores[tipo]">{{ tipo }}</p>
+              <p class="igual-modal"><span class="bold-text">Altura:</span> {{ pokemon.altura }}</p>
+              <p class="igual-modal"><span class="bold-text">Peso:</span> {{ pokemon.peso }}</p>
               <h2>Estadísticas:</h2>
               <div v-for="stat in pokemon.estadisticas" :key="stat.name">
                 <div class="stat-container">
@@ -79,7 +86,7 @@
 
 <script setup>
 import axios from "axios";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 
 const todo = ref([]);
 const colores = {
@@ -101,6 +108,7 @@ const colores = {
   ghost:"#8f728e"
 };
 const componenteBuscar = ref(false); 
+const opciones = ['grass','poison','fire','flying','water','bug','normal','electric','ground','fairy','fighting','psychic','rock','steel','ice','ghost'];
 
 let cant = 1
 let limites = 50
@@ -139,6 +147,7 @@ function buscar(){
   componenteBuscar.value = true
 
 }
+
 </script>
 
 <style scoped>
@@ -146,6 +155,11 @@ function buscar(){
   body {
     font-family: Arial, sans-serif;
     background-color: #f8f8f8;
+  }
+
+  #logo{
+    width: 120px;
+    height: 50px;
   }
 
   h1 {
@@ -157,14 +171,14 @@ function buscar(){
   .card-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
-
     gap: 1rem;
     padding: 20px;
   }
 
   .img-fluid{
-    width: 270px;
-    height: 250px;
+    width: 570px;
+    height: 550px;
+    margin-left: 30%;
   }
 
   .card-img-top{
@@ -186,36 +200,78 @@ function buscar(){
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
+
+  .nombre-modal{
+    font-size: 55px;
+    margin-top: 1%;
+    
+  }
+
+  .id-modal{
+    font-size: 55px;
+    margin-right: 90%;
+    margin-top: 1%;
+    margin-bottom: 1%;
+  }
+
+  .igual-modal{
+    font-size: 25px;
+  }
+
+  .bold-text {
+    font-weight: bold;
+    font-size: 25px;
+  }
+
+  .modal-dialog{
+    max-width: 80%;
+    width: 80%;
+  }
+
+  #tipo-modal{
+    font-size: 120%;
+    
+  }
   .modal button.btn-close {
     color: #333;
   }
   .stat-container {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
   }
 
   .stat-name {
+    font-size: 18px;
     font-weight: bold;
   }
 
   .stat-progress {
     flex: 1;
     margin-left: 10px;
+    height: 30px;
+    margin-bottom: 5px;
+  }
+
+  .progress-bar {
+  height: 900%; 
+  font-size: 16px;
+  }
+  
+  .arriba{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
   }
 
   .barra {
     color: #fff;
-    padding: 10px;
-    display: flex;
-    width: 700px;
+    height: 60px;
   }
 
   .logo {
-    font-size: 24px;
-    margin: 0;
-    padding: 0;
-    margin-right: 20px;
+  margin-right: 20px;
   }
 
   #barra1 {
@@ -225,15 +281,17 @@ function buscar(){
     color: black;
     border: 1px solid black;
     border-radius: 400px;
+    width: 450px;
+    height: 38px;
   }
 
   #boton {
-    background-color: #fff;
-    color: #007bff;
+    background-color: #007bff;
     border: 1px solid black;
     padding: 8px 16px;
     margin-left:30px ;
     border-radius: 400px;
+    font-weight: bold;
   }
 
   #filtro {
@@ -261,6 +319,36 @@ function buscar(){
   border: 1px solid transparent;
   color: black;
  }
+
+
+ .card-body {
+    background-color: #f7f7f7;
+    padding: 20px;
+    border-radius: 10px;
+  }
+
+  #opciones{
+    display: flex;
+    flex-direction: row;
+    margin-right: 600%;
+  }
+
+  #opcion1{
+    text-align: center;
+    justify-content: center;
+    padding: 15px;
+  }
+
+  #collapseExample{
+    margin-right: 40px;
+  }
+
+  #ultimo{
+    height: 40px;
+    width: 90px;
+    font-weight: bold;
+    background-color: #9bfae0;
+  }
 
 </style>
 
