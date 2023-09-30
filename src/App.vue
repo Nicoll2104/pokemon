@@ -503,8 +503,8 @@ const radio=ref()
   flex-direction: column-reverse;
  }
  .img-fluid{
-    width: 570px;
-    height: 550px;
+    width: 270px;
+    height: 250px;
     margin-left: 10px;
   }
 
