@@ -311,22 +311,17 @@ const nuevo = ref([]);
 const componenteNuevo = ref(false);
 
 async function filtrar(opcion) {
-  nuevo.value = []; // Limpiar el array antes de agregar nuevos Pokémon
+  nuevo.value = []; 
 
-  // Obtener datos de la API de tipo de Pokémon
   let response = await axios.get(`https://pokeapi.co/api/v2/type/${opcion}`);
 
-  // Obtener las URLs de los Pokémon del tipo específico
   let pokemonUrls = response.data.pokemon.map((poke) => poke.pokemon.url);
 
-  // Hacer solicitudes para obtener detalles de cada Pokémon
   await Promise.all(
     pokemonUrls.map(async (url) => {
-      // No hay try...catch aquí, los errores serán manejados por el código circundante
       let pokemonResponse = await axios.get(url);
       let pokemonData = pokemonResponse.data;
 
-      // Agregar el Pokémon al array nuevo
       nuevo.value.push({
         id: pokemonData.id,
         img: pokemonData.sprites.other["official-artwork"].front_default,
